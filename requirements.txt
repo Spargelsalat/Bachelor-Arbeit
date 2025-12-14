@@ -1,0 +1,23 @@
+# LLM 
+langchain
+langchain-community
+langchain-openai
+openai
+ollama
+# Graph
+neo4j
+# PDF
+pdfplumber
+# Datenverarbeitung
+pandas
+numpy
+# Utilities
+python-dotenv
+pydantic
+tqdm
+tenacity
+# Evaluation
+scikit-learn
+# Logging
+loguru
+rich
