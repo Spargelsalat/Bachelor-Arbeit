@@ -2,6 +2,7 @@
 langchain
 langchain-community
 langchain-openai
+langchain-text-splitters
 openai
 ollama
 # Graph

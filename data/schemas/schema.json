@@ -1,0 +1,73 @@
+{
+  "entity_types": [
+    {
+      "name": "module",
+      "description": "A software module within the manufacturing system.",
+      "examples": [
+        "Infor LN Manufacturing",
+        "Assembly Control module"
+      ]
+    },
+    {
+      "name": "parameter",
+      "description": "Configuration settings or options within a module.",
+      "examples": [
+        "order Routing Parameters (tirou0100m000)",
+        "Assembly Control Parameters (tiasc0100m000)"
+      ]
+    },
+    {
+      "name": "session",
+      "description": "A specific interface or configuration screen within the software.",
+      "examples": [
+        "Calendar Availability Types (tcccp0150m000)",
+        "Configurable Item - Assembly Line (tiapl2500m000)"
+      ]
+    },
+    {
+      "name": "process",
+      "description": "A series of steps or operations performed within the system.",
+      "examples": [
+        "WIP transfers",
+        "Generate Assembly Orders (tiapl3201m000)"
+      ]
+    },
+    {
+      "name": "function",
+      "description": "Specific capabilities or features provided by the software.",
+      "examples": [
+        "Assembly order handling",
+        "Sales order entry"
+      ]
+    }
+  ],
+  "relation_types": [
+    {
+      "name": "contains",
+      "description": "Indicates that one entity includes another within its structure.",
+      "example_triple": [
+        "Infor LN Manufacturing",
+        "contains",
+        "Assembly Control module"
+      ]
+    },
+    {
+      "name": "uses",
+      "description": "Indicates that one entity utilizes another for a specific purpose.",
+      "example_triple": [
+        "Assembly order handling",
+        "uses",
+        "Generate Assembly Orders (tiapl3201m000)"
+      ]
+    },
+    {
+      "name": "depends_on",
+      "description": "Indicates that one entity relies on another to function properly.",
+      "example_triple": [
+        "Sales order entry",
+        "depends_on",
+        "Configurable Item - Assembly Line (tiapl2500m000)"
+      ]
+    }
+  ]
+}
