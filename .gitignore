@@ -56,3 +56,7 @@ logs/
 *.bak
 *.tmp
 *.temp
+.env.infor
+.env.docred.cloud
+*.json
+*.jsonl

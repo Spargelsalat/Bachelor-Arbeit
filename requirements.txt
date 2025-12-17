@@ -1,24 +1,17 @@
-# LLM 
 langchain
 langchain-community
 langchain-openai
 langchain-text-splitters
 openai
 ollama
-# Graph
 neo4j
-# PDF
 pdfplumber
-# Datenverarbeitung
 pandas
 numpy
-# Utilities
 python-dotenv
 pydantic
 tqdm
 tenacity
-# Evaluation
 scikit-learn
-# Logging
 loguru
 rich
