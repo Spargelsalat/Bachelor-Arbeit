@@ -60,3 +60,4 @@ logs/
 .env.docred.cloud
 *.json
 *.jsonl
+prompts.py
