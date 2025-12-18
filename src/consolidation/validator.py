@@ -14,16 +14,13 @@ from typing import Any, Optional
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from dotenv import load_dotenv  # noqa: E402
-from openai import OpenAI  # noqa: E402
-from config.settings import load_settings  # noqa: E402
+from dotenv import load_dotenv
+from openai import OpenAI
+from config.settings import load_settings
 
 logger = logging.getLogger(__name__)
 
 
-# -----------------------------
-# Helpers
-# -----------------------------
 def _setup_logging(level: str) -> None:
     logging.basicConfig(
         level=getattr(logging, level, logging.INFO),
@@ -94,9 +91,6 @@ def normalize_for_match(text: str) -> str:
     return t
 
 
-# -----------------------------
-# Config
-# -----------------------------
 @dataclass(frozen=True)
 class ValidateConfig:
     input_dir: Path
@@ -137,9 +131,6 @@ def load_validate_config() -> ValidateConfig:
     )
 
 
-# -----------------------------
-# LLM (optional)
-# -----------------------------
 @dataclass(frozen=True)
 class LLMRuntime:
     backend: str
@@ -224,14 +215,10 @@ def llm_validate_relation(
         return "UNSURE"
 
 
-# -----------------------------
-# Chunk index
-# -----------------------------
 def infer_chunk_file_for_relations(rel_file: Path, chunk_dir: Path) -> Path:
     """
     rel_file:   <base>.relations.resolved.jsonl
     chunk file: <base>.chunks.jsonl
-    base enthält i.d.R. bereits ".llm" oder ".rule"
     """
     base = rel_file.stem.replace(".relations.resolved", "")
     candidate = chunk_dir / f"{base}.chunks.jsonl"
@@ -255,9 +242,6 @@ def load_chunk_text_map(chunk_file: Path) -> dict[int, str]:
     return m
 
 
-# -----------------------------
-# Validation
-# -----------------------------
 def validate_relations_file(rel_file: Path, cfg: ValidateConfig) -> Path:
     chunk_file = infer_chunk_file_for_relations(rel_file, cfg.chunk_dir)
     chunk_map = load_chunk_text_map(chunk_file)
@@ -317,7 +301,7 @@ def validate_relations_file(rel_file: Path, cfg: ValidateConfig) -> Path:
                 else:
                     status = "UNKNOWN"
                     unknown += 1
-            # Optional LLM escalation
+            #  LLM escalation
             llm_status = None
             if (
                 cfg.use_llm
@@ -357,9 +341,6 @@ def validate_relations_file(rel_file: Path, cfg: ValidateConfig) -> Path:
     return out_path
 
 
-# -----------------------------
-# CLI
-# -----------------------------
 def list_relation_files(input_dir: Path) -> list[Path]:
     if not input_dir.exists():
         raise FileNotFoundError(f"Validate input dir not found: {input_dir.resolve()}")

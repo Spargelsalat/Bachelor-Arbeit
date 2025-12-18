@@ -12,9 +12,9 @@ from typing import Any, Optional
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from dotenv import load_dotenv  # noqa: E402
-from openai import OpenAI  # noqa: E402
-from config.settings import load_settings  # noqa: E402
+from dotenv import load_dotenv
+from openai import OpenAI
+from config.settings import load_settings
 
 logger = logging.getLogger(__name__)
 

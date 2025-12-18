@@ -13,16 +13,13 @@ from typing import Any, Iterator, Optional
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from dotenv import load_dotenv  # noqa: E402
-from openai import OpenAI  # noqa: E402
-from config.settings import load_settings  # noqa: E402
+from dotenv import load_dotenv  
+from openai import OpenAI  
+from config.settings import load_settings  
 
 logger = logging.getLogger(__name__)
 
 
-# -----------------------------
-# Helpers
-# -----------------------------
 def _setup_logging(level: str) -> None:
     logging.basicConfig(
         level=getattr(logging, level, logging.INFO),
@@ -86,30 +83,25 @@ def extract_first_json(text: str) -> Optional[Any]:
         return None
 
 
-# -----------------------------
-# Config
-# -----------------------------
 @dataclass(frozen=True)
 class ChunkConfig:
     mode: str  # rule | llm
     out_dir: Path
     overwrite: bool
-    # rule baseline / fallback
+    # rule baseline 
     size_chars: int
     overlap_chars: int
-    # safety
     max_doc_chars: int
     max_chunks: int
-    # LLM semantic chunking
+    # LLM chunking
     llm_backend: str  # openrouter | ollama
     llm_max_paragraphs: int
     llm_preview_chars: int
     llm_temperature: float
-    # hybrid: rule subchunks inside semantic segments
     llm_subchunk_enable: bool
     llm_subchunk_size_chars: int
     llm_subchunk_overlap_chars: int
-    # output suffix
+    #  suffix
     suffix_rule: str
     suffix_llm: str
     suffix_llm_fallback: str
@@ -158,9 +150,6 @@ def validate_rule_cfg(size_chars: int, overlap_chars: int) -> None:
         )
 
 
-# -----------------------------
-# Rule chunking (baseline/fallback)
-# -----------------------------
 def estimate_expected_chunks(text_len: int, size_chars: int, overlap_chars: int) -> int:
     step = size_chars - overlap_chars
     if step <= 0:
@@ -216,9 +205,6 @@ def iter_rule_records(text: str, cfg: ChunkConfig) -> Iterator[dict[str, Any]]:
         i += 1
 
 
-# -----------------------------
-# LLM semantic chunking (paragraph based)
-# -----------------------------
 @dataclass(frozen=True)
 class Paragraph:
     idx: int
@@ -363,9 +349,7 @@ def validate_segments(segments: list[dict[str, Any]], n_paragraphs: int) -> bool
     return True
 
 
-# -----------------------------
-# Output
-# -----------------------------
+
 def write_chunks_jsonl(
     out_path: Path,
     source_text_path: Path,
@@ -407,9 +391,7 @@ def write_chunks_jsonl(
     logger.info("Wrote %d chunks -> %s", written, out_path.name)
 
 
-# -----------------------------
-# Hybrid record builder
-# -----------------------------
+
 def iter_llm_hybrid_records(
     text: str,
     paragraphs: list[Paragraph],
@@ -466,9 +448,6 @@ def iter_llm_hybrid_records(
             chunk_id += 1
 
 
-# -----------------------------
-# CLI
-# -----------------------------
 def build_argparser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Chunk extracted documents into semantic units (rule or LLM hybrid)."
@@ -546,9 +525,7 @@ def run() -> None:
         max_chunks_hard = (
             cfg.max_chunks if cfg.max_chunks > 0 else max(2000, expected_rule * 10)
         )
-        # -----------------------------
-        # LLM mode
-        # -----------------------------
+
         if mode == "llm":
             paragraphs = split_into_paragraphs(text)
             logger.info("Paragraphs detected: %d", len(paragraphs))
@@ -604,9 +581,7 @@ def run() -> None:
                 max_chunks_hard=max_chunks_hard,
             )
             continue
-        # -----------------------------
-        # Rule mode
-        # -----------------------------
+
         logger.info("Rule-based chunking: expected ~%d chunks", expected_rule)
         out_path = out_path_for(document_title, cfg, "rule")
         records = iter_rule_records(text, cfg)

@@ -15,16 +15,13 @@ from typing import Any, Optional
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from dotenv import load_dotenv  # noqa: E402
-from openai import OpenAI  # noqa: E402
-from config.settings import load_settings  # noqa: E402
+from dotenv import load_dotenv
+from openai import OpenAI
+from config.settings import load_settings
 
 logger = logging.getLogger(__name__)
 
 
-# -----------------------------
-# Helpers
-# -----------------------------
 def _setup_logging(level: str) -> None:
     logging.basicConfig(
         level=getattr(logging, level, logging.INFO),
@@ -80,7 +77,7 @@ def slugify(value: str) -> str:
 
 def normalize_name(name: str) -> str:
     n = name.strip().lower()
-    n = n.replace("\u00ad", "")  # soft hyphen
+    n = n.replace("\u00ad", "")  #  hyphen
     n = re.sub(r"\s+", " ", n)
     n = re.sub(r"[“”\"']", "", n)
     n = n.strip()
@@ -88,7 +85,7 @@ def normalize_name(name: str) -> str:
 
 
 def similarity(a: str, b: str) -> float:
-    # deterministisch, stdlib, ausreichend für BA
+    # deterministisch
     return difflib.SequenceMatcher(None, a, b).ratio()
 
 
@@ -112,9 +109,6 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]], overwrite: bool) -> None
     logger.info("Wrote: %s (%d rows)", path.name, len(rows))
 
 
-# -----------------------------
-# LLM (optional)
-# -----------------------------
 @dataclass(frozen=True)
 class LLMRuntime:
     backend: str
@@ -200,9 +194,6 @@ def llm_is_same_entity(
         return False
 
 
-# -----------------------------
-# Core data structures
-# -----------------------------
 @dataclass
 class CanonicalEntity:
     global_id: str
@@ -214,7 +205,7 @@ class CanonicalEntity:
 
 
 def pick_best_name(current: str, candidate: str) -> str:
-    # bevorzugt "schöneren" Namen (länger, aber nicht komplett aus Großbuchstaben)
+    # bevorzugt "schöneren" Namen
     if len(candidate) > len(current):
         return candidate
     return current
@@ -228,9 +219,6 @@ def merge_attributes(base: dict[str, Any], add: dict[str, Any]) -> dict[str, Any
     return out
 
 
-# -----------------------------
-# Entity Resolution
-# -----------------------------
 @dataclass(frozen=True)
 class ResolveConfig:
     input_dir: Path
@@ -290,7 +278,7 @@ def resolve_entities_and_relations(
             raise ValueError("entity missing type/name")
         norm = normalize_name(name)
         candidates = entities_by_type.get(et, [])
-        # 1) exact match on normalized name
+        # exact match
         for c in candidates:
             if c.norm_name == norm:
                 c.name = pick_best_name(c.name, name)
@@ -299,7 +287,7 @@ def resolve_entities_and_relations(
                 )
                 c.mentions.append(ctx)
                 return c
-        # 2) fuzzy match (bounded)
+        #  fuzzy match
         scored: list[tuple[float, CanonicalEntity]] = []
         for c in candidates:
             scored.append((similarity(norm, c.norm_name), c))
@@ -333,7 +321,7 @@ def resolve_entities_and_relations(
                     )
                     best.mentions.append(ctx)
                     return best
-        # 3) create new canonical entity
+        # create new canonical entity
         gid = f"{et}:{slugify(name)}"
         ce = CanonicalEntity(
             global_id=gid,
@@ -426,9 +414,6 @@ def resolve_entities_and_relations(
     return out_entities, out_relations
 
 
-# -----------------------------
-# CLI
-# -----------------------------
 def build_argparser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description="Entity resolution / consolidation over extractions.jsonl"
@@ -474,7 +459,7 @@ def run() -> None:
             continue
         logger.info("Resolving: %s", f.name)
         entities, relations = resolve_entities_and_relations(f, cfg)
-        # meta header (optional, als erste Zeile)
+        # meta header
         meta = {
             "_meta": {
                 "resolved_at": utc_now_iso(),
@@ -485,7 +470,6 @@ def run() -> None:
                 "llm_model": cfg.llm_model if cfg.use_llm else None,
             }
         }
-        # Wir schreiben meta als erste Zeile, danach normale Records.
         write_jsonl(out_entities_path, [meta] + entities, overwrite=True)
         write_jsonl(out_relations_path, [meta] + relations, overwrite=True)
 

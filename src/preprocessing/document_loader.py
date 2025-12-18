@@ -8,8 +8,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-# Falls du das Skript direkt ausführst: python src/preprocessing/document_loader.py
-# Dann muss der Projektroot in den Path, damit "config.settings" gefunden wird.
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -31,7 +29,7 @@ def list_pdfs(raw_dir: Path) -> list[Path]:
         raise FileNotFoundError(f"Raw directory not found: {raw_dir}")
     pdfs = sorted(raw_dir.glob("**/*.pdf"))
     pdfs += sorted(raw_dir.glob("**/*.PDF"))
-    # Duplikate entfernen (falls beides matched)
+    # Duplikate
     pdfs = sorted(set(pdfs))
     return pdfs
 
@@ -47,7 +45,7 @@ def file_sha256(path: Path) -> str:
 def extract_text_pdfplumber(
     pdf_path: Path, max_pages: int = 0, min_chars: int = 0
 ) -> tuple[str, dict]:
-    import pdfplumber  # local import, damit das Modul nicht crasht wenn dependency fehlt
+    import pdfplumber  # local import, damit das Modul nicht crasht wenn dependency fehlt lol
 
     pages_used = 0
     pages_total = 0
@@ -137,7 +135,6 @@ def extract_text(
 
 
 def safe_stem(path: Path) -> str:
-    # Dateiname stabil und windows-safe
     stem = path.stem
     keep = []
     for ch in stem:

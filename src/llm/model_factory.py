@@ -37,7 +37,7 @@ def load_openrouter_config() -> LLMConfig:
 
 
 def build_openrouter_client(cfg: LLMConfig) -> OpenAI:
-    # OpenRouter ist OpenAI-kompatibel. Zusätzliche Header sind optional.
+    # OpenRouter ist OpenAIAPI
     default_headers = {}
     if cfg.site_url:
         default_headers["HTTP-Referer"] = cfg.site_url

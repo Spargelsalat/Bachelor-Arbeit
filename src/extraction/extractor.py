@@ -14,22 +14,20 @@ from typing import Any, Optional
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-from dotenv import load_dotenv  # noqa: E402
-from openai import OpenAI  # noqa: E402
+from dotenv import load_dotenv  
+from openai import OpenAI  
 from tenacity import (
     retry,
     stop_after_attempt,
     wait_exponential,
     retry_if_exception_type,
-)  # noqa: E402
-from config.settings import load_settings  # noqa: E402
+) 
+from config.settings import load_settings 
 
 logger = logging.getLogger(__name__)
 
 
-# -----------------------------
-# Helpers
-# -----------------------------
+
 def _setup_logging(level: str) -> None:
     logging.basicConfig(
         level=getattr(logging, level, logging.INFO),
@@ -40,7 +38,7 @@ def _setup_logging(level: str) -> None:
 def _clean_env(value: str | None) -> str:
     if value is None:
         return ""
-    # inline comments kill model ids -> strip everything after #
+    # inline comments kill
     return value.split("#", 1)[0].strip()
 
 
@@ -88,9 +86,6 @@ def extract_first_json(text: str) -> Optional[Any]:
         return None
 
 
-# -----------------------------
-# Config
-# -----------------------------
 @dataclass(frozen=True)
 class ExtractConfig:
     input_dir: Path
@@ -185,9 +180,7 @@ def build_llm_runtime(
     raise ValueError(f"Unbekanntes EXTRACT_LLM_BACKEND: {backend}")
 
 
-# -----------------------------
-# IO
-# -----------------------------
+
 def list_chunk_files(input_dir: Path) -> list[Path]:
     if not input_dir.exists():
         raise FileNotFoundError(f"Chunk input dir not found: {input_dir.resolve()}")
@@ -214,9 +207,7 @@ def ensure_dirs(cfg: ExtractConfig) -> None:
     cfg.error_dir.mkdir(parents=True, exist_ok=True)
 
 
-# -----------------------------
-# Schema constraints
-# -----------------------------
+
 def schema_allowed_types(schema: dict[str, Any]) -> tuple[set[str], set[str]]:
     ent = set()
     rel = set()
@@ -289,9 +280,6 @@ def filter_extraction_to_schema(
     return {"entities": entities_out, "relations": rels_out}
 
 
-# -----------------------------
-# Prompting
-# -----------------------------
 def schema_compact(schema: dict[str, Any]) -> dict[str, Any]:
     return {
         "domain": schema.get("domain", "Domain"),
@@ -380,9 +368,6 @@ def validate_extraction_shape(obj: dict[str, Any]) -> bool:
     return True
 
 
-# -----------------------------
-# LLM calls
-# -----------------------------
 class LLMCallError(RuntimeError):
     pass
 
@@ -409,9 +394,7 @@ def make_llm_call_with_retry(max_attempts: int):
     )
 
 
-# -----------------------------
-# Execution
-# -----------------------------
+
 def append_jsonl(path: Path, row: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as f:
